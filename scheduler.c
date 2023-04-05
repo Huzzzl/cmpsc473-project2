@@ -87,7 +87,11 @@ int srtf_add(float current_time, int tid, int remaining_time){
 int choose(void){
     threadControl *temp = thread_head;
     threadControl *choosen = thread_head;
+    int min = (int)thread_head->current_time;
     while(temp){
+        if ((int)temp->current_time < min){
+            min = (int)temp->current_time;
+        }
         if ((temp->current_time <= global_time && temp->remaining_time < choosen->remaining_time ) ||
         (temp->current_time <= global_time && temp->remaining_time == choosen->remaining_time && temp->tid < choosen->tid)){
             choosen = temp;
@@ -96,6 +100,24 @@ int choose(void){
             break;
         }
         temp = temp->next;
+    }
+    if (choosen == thread_head && choosen->current_time > global_time){
+        global_time = min;
+        temp = thread_head;
+        choosen = thread_head;
+        while(temp){
+            if ((int)temp->current_time < min){
+                min = (int)temp->current_time;
+            }
+            if ((temp->current_time <= global_time && temp->remaining_time < choosen->remaining_time ) ||
+            (temp->current_time <= global_time && temp->remaining_time == choosen->remaining_time && temp->tid < choosen->tid)){
+                choosen = temp;
+            }
+            if (temp == thread_tail){
+                break;
+            }
+            temp = temp->next;
+        }
     }
     return choosen->tid;
 }
